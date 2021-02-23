@@ -5,9 +5,24 @@ import (
 	"context"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/dimfeld/httptreemux/v5"
+	"github.com/google/uuid"
 )
+
+// ctxKey represents the type of value for the context key.
+type ctxKey int
+
+// KeyValues is how request values are stored/retrieved.
+const KeyValues ctxKey = 1
+
+// Values represent state for each request.
+type Values struct {
+	TraceID    string
+	Now        time.Time
+	StatusCode int
+}
 
 // A Handler is a type that handles an http request within our own little mini
 // framework.
@@ -43,9 +58,15 @@ func (a *App) Handle(method string, path string, handler Handler, mw ...Middlewa
 
 	h := func(w http.ResponseWriter, r *http.Request) {
 
+		v := Values{
+			TraceID: uuid.New().String(),
+			Now:     time.Now(),
+		}
+		ctx := context.WithValue(r.Context(), KeyValues, &v)
+
 		// INJECT FOUNDATIONAL LAYER CODE
 
-		if err := handler(r.Context(), w, r); err != nil {
+		if err := handler(ctx, w, r); err != nil {
 			// Don't know yet.
 			return
 		}
