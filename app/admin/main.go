@@ -22,11 +22,58 @@ openssl rsa -pubout -in private.pem -out public.pem
 
 func main() {
 	//err := GenKey()
-	err := GenToken()
+	//err := GenToken()
+	err := ParseToken()
 
 	if err != nil {
 		log.Fatalln(err)
 	}
+}
+
+// ParseToken hacks the code we need to parse and validate.
+func ParseToken() error {
+	tokenStr := "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NDU3MzA5NDMuNDEyMDY5LCJpYXQiOjE2MTQxOTQ5NDMuNDEyMDczLCJpc3MiOiJoYWNraW5nIHByb2plY3QiLCJzdWIiOiIxMjM0NTYiLCJSb2xlcyI6WyJBRE1JTiIsIk9QRVJBVE9SIl19.RNFK9EOKXnnw1im1tXrM5PI7OusH9lizu-i9BYmLy5rE3ahts7WbwfUWEhHHeeBdYvrZNvbV1kih6xTRMS-bTuRbN9RYqkNZOv2OvCoEr_xt87TicD6AaEWEJ62FRVcxSTSGgzb8epgocaJkbzty7OkFaIipna7cF6gvzrvOfXXdL8bXvBb-HcNwS_337EAilrXeTbOm6xUJKrrJ3YkmScqpba90sRJNINYvEqA3GTdt-wr4dIsARrrQKe2IzlnDSJM8Ya1JDa7HcL3BcBd3s30BoCfy3IQpWsfq-9rjotKDnlP7tSXZlJQIehvltCte99Y-q-jYqlu3w6pmpm4JEg"
+	privateKeyFile := "private.pem"
+	algorithm := "RS256"
+
+	privatePEM, err := ioutil.ReadFile(privateKeyFile)
+	if err != nil {
+		return errors.Wrap(err, "reading PEM private key file")
+	}
+
+	privateKey, err := jwt.ParseRSAPrivateKeyFromPEM(privatePEM)
+	if err != nil {
+		return errors.Wrap(err, "parsing PEM into private key")
+	}
+
+	// Create the token parser to use. The algorithm used to sign the JWT must be
+	// validated to avoid a critical vulnerability:
+	// https://auth0.com/blog/critical-vulnerabilities-in-json-web-token-libraries/
+	parser := jwt.NewParser(jwt.WithValidMethods([]string{algorithm}), jwt.WithAudience("student"))
+
+	keyFunc := func(t *jwt.Token) (interface{}, error) {
+		return &privateKey.PublicKey, nil
+	}
+
+	var claims struct {
+		jwt.StandardClaims
+		Roles []string
+	}
+	token, err := parser.ParseWithClaims(tokenStr, &claims, keyFunc)
+	if err != nil {
+		return errors.Wrap(err, "parsing token")
+	}
+
+	if !token.Valid {
+		return errors.New("invalid token")
+	}
+
+	fmt.Print("\n\n")
+	fmt.Println("Header:", token.Header)
+	fmt.Println("Claims:", token.Claims)
+	fmt.Print("\n\n")
+
+	return nil
 }
 
 // GenToken generates a JWT for the specified user.
