@@ -22,7 +22,7 @@ openssl rsa -pubout -in private.pem -out public.pem
 
 func main() {
 	//err := GenKey()
-	//err := GenToken()
+	// err := GenToken()
 	err := ParseToken()
 
 	if err != nil {
@@ -32,7 +32,7 @@ func main() {
 
 // ParseToken hacks the code we need to parse and validate.
 func ParseToken() error {
-	tokenStr := "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NDU3MzA5NDMuNDEyMDY5LCJpYXQiOjE2MTQxOTQ5NDMuNDEyMDczLCJpc3MiOiJoYWNraW5nIHByb2plY3QiLCJzdWIiOiIxMjM0NTYiLCJSb2xlcyI6WyJBRE1JTiIsIk9QRVJBVE9SIl19.RNFK9EOKXnnw1im1tXrM5PI7OusH9lizu-i9BYmLy5rE3ahts7WbwfUWEhHHeeBdYvrZNvbV1kih6xTRMS-bTuRbN9RYqkNZOv2OvCoEr_xt87TicD6AaEWEJ62FRVcxSTSGgzb8epgocaJkbzty7OkFaIipna7cF6gvzrvOfXXdL8bXvBb-HcNwS_337EAilrXeTbOm6xUJKrrJ3YkmScqpba90sRJNINYvEqA3GTdt-wr4dIsARrrQKe2IzlnDSJM8Ya1JDa7HcL3BcBd3s30BoCfy3IQpWsfq-9rjotKDnlP7tSXZlJQIehvltCte99Y-q-jYqlu3w6pmpm4JEg"
+	tokenStr := "eyJhbGciOiJSUzI1NiIsImtpZCI6InB1YmxpY2tleWlkIiwidHlwIjoiSldUIn0.eyJleHAiOjE2NDU3MzM5NTYuNjA4MTUsImlhdCI6MTYxNDE5Nzk1Ni42MDgxNTQsImlzcyI6ImhhY2tpbmcgcHJvamVjdCIsInN1YiI6IjEyMzQ1NiIsIlJvbGVzIjpbIkFETUlOIiwiT1BFUkFUT1IiXX0.uENotWM1qXyjHDHHFdZvZxI-fi1MBZsYRx-B1Dn7C06ImsbFcBCMwZ_m_S6PA3hrmsTnVwoQrddQwl2WWD2hUy4eHD1qHJ5fC03XDiU-vyZxPYaT7s_YBPDJv4sdW-wruITGmjq2mfOs8jh2kMrKZqhrC0aoKzFtssK9PtzeMGCEhFO93V1aG0w1HwvPG6eYZE2fhqXT5i_O-Q_tDrLhj6DlI1pOL7Kz_5vb-z8ffQ1l5zSAndM1Jsp150k3_o0_iU-AcM5okkhsKrx8B9kUSwM-iaqlKoem6SLKrg86IdH8mtzVq7T7E69arTFxMpuvWswsWHYukf5HDENTdAED6Q"
 	privateKeyFile := "private.pem"
 	algorithm := "RS256"
 
@@ -118,6 +118,7 @@ func GenToken() error {
 	}
 
 	token := jwt.NewWithClaims(method, claims)
+	token.Header["kid"] = "publickeyid"
 
 	str, err := token.SignedString(privateKey)
 	if err != nil {
