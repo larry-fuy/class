@@ -18,9 +18,18 @@ github.com/go-playground/universal-translator
 # github.com/google/uuid v1.2.0
 ## explicit
 github.com/google/uuid
+# github.com/jmoiron/sqlx v1.3.1
+## explicit
+github.com/jmoiron/sqlx
+github.com/jmoiron/sqlx/reflectx
 # github.com/leodido/go-urn v1.2.1
 ## explicit
 github.com/leodido/go-urn
+# github.com/lib/pq v1.9.0
+## explicit
+github.com/lib/pq
+github.com/lib/pq/oid
+github.com/lib/pq/scram
 # github.com/pkg/errors v0.9.1
 ## explicit
 github.com/pkg/errors
