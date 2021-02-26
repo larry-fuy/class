@@ -28,6 +28,10 @@ kind-load:
 kind-services:
 	kustomize build zarf/k8s/dev | kubectl apply -f -
 
+kind-update: sales-class
+	kind load docker-image sales-api-amd64:1.0 --name ardan-starter-cluster
+	kubectl delete pods -lapp=sales-api
+
 kind-logs:
 	kubectl logs -lapp=sales-api --all-containers=true -f
 
