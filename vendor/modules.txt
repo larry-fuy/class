@@ -36,6 +36,10 @@ github.com/lib/pq/scram
 # github.com/pkg/errors v0.9.1
 ## explicit
 github.com/pkg/errors
+# golang.org/x/crypto v0.0.0-20210220033148-5ea612d1eb83
+## explicit
+golang.org/x/crypto/bcrypt
+golang.org/x/crypto/blowfish
 # gopkg.in/go-playground/assert.v1 v1.2.1
 ## explicit
 # gopkg.in/go-playground/validator.v9 v9.31.0
